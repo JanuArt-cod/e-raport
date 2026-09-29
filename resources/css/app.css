@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- LIGHT & DARK MODE GLASSMORPHISM & GLOW --- */
+
+/* Default / Light Mode Glass Card */
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Dark Mode Glass Card (.dark ditambahkan oleh script) */
+.dark .glass-card {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Glass Input Light / Dark */
+.glass-input {
+    background: rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+}
+
+.dark .glass-input {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.glass-input:focus {
+    border-color: rgba(16, 185, 129, 0.8);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    outline: none;
+}
+
+.glow-effect {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+}
+
+/* Custom Keyframe Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}

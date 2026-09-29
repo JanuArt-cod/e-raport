@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class SchoolClass extends Model
+{
+    use HasFactory;
+
+    protected $table = 'classes';
+
+    protected $fillable = [
+        'name',
+        'homeroom_teacher_id', // Tambahkan ini
+    ];
+
+    /**
+     * Relasi: Kelas ini memiliki satu Wali Kelas (User dengan role guru)
+     */
+    public function homeroomTeacher(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'homeroom_teacher_id');
+    }
+
+    /**
+     * Relasi: Satu kelas punya banyak siswa
+     */
+    public function students(): HasMany
+    {
+        return $this->hasMany(Student::class, 'class_id');
+    }
+}
