@@ -18,7 +18,7 @@ return new class extends Migration
             // Mengarah ke guru (wali kelas) yang menulis catatan
             $table->foreignId('teacher_id')->constrained('users')->onDelete('cascade');
             // Isi catatan/pesan dari wali kelas
-            $table->text('note');
+            $table->text('note')->nullable();
             $table->timestamps();
         });
     }

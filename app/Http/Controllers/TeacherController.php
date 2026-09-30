@@ -16,10 +16,44 @@ class TeacherController extends Controller
     {
         $teacherId = auth()->id();
         
-        // Ambil data penugasan berdasarkan guru yang login
-        $assignments = TeachingAssignment::with(['schoolClass', 'subject'])
+        // Ambil data penugasan beserta relasi kelas, siswa, dan mapel
+        $assignments = TeachingAssignment::with(['schoolClass.students', 'subject'])
             ->where('user_id', $teacherId)
             ->get();
+
+        // Hitung progres pengisian nilai untuk setiap penugasan kelas
+        foreach ($assignments as $assignment) {
+            $classId = $assignment->class_id;
+            $subjectId = $assignment->subject_id;
+
+            $totalStudents = $assignment->schoolClass->students->count();
+            
+            $gradedCount = Grade::where('class_id', $classId)
+                ->where('subject_id', $subjectId)
+                ->whereNotNull('score')
+                ->where('score', '!=', '')
+                ->count();
+
+            $percentage = $totalStudents > 0 ? round(($gradedCount / $totalStudents) * 100) : 0;
+
+            $statusLabel = 'Belum Input';
+            $statusClass = 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20';
+
+            if ($totalStudents > 0 && $gradedCount >= $totalStudents) {
+                $statusLabel = 'Lengkap';
+                $statusClass = 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+            } elseif ($gradedCount > 0) {
+                $statusLabel = 'Kurang Lengkap';
+                $statusClass = 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20';
+            }
+
+            // Masukkan atribut tambahan ke objek assignment
+            $assignment->total_students = $totalStudents;
+            $assignment->graded_count = $gradedCount;
+            $assignment->percentage = $percentage;
+            $assignment->status_label = $statusLabel;
+            $assignment->status_class = $statusClass;
+        }
 
         return view('guru.dashboard', compact('assignments'));
     }
@@ -44,7 +78,12 @@ class TeacherController extends Controller
             ->where('subject_id', $subjectId)
             ->pluck('score', 'student_id'); // Format: [student_id => score]
 
-        return view('guru.input-nilai', compact('assignment', 'students', 'existingGrades', 'classId', 'subjectId'));
+        // Ambil deskripsi capaian kompetensi yang sudah pernah diinput sebelumnya (jika ada)
+        $existingDescriptions = Grade::where('class_id', $classId)
+            ->where('subject_id', $subjectId)
+            ->pluck('description', 'student_id'); // Format: [student_id => description]
+
+        return view('guru.input-nilai', compact('assignment', 'students', 'existingGrades', 'existingDescriptions', 'classId', 'subjectId'));
     }
 
     // 3. Menyimpan nilai siswa secara massal (Bulk Store)
@@ -52,14 +91,15 @@ class TeacherController extends Controller
     {
         $teacherId = auth()->id();
 
-        // Validasi input skor (tiap nilai berupa angka antara 0 sampai 100)
         $request->validate([
             'scores' => 'required|array',
             'scores.*' => 'nullable|numeric|min:0|max:100',
+            'descriptions' => 'nullable|array',
         ]);
 
         foreach ($request->scores as $studentId => $score) {
-            // Jika kolom nilai tidak kosong (atau bernilai 0), simpan/perbarui
+            $description = $request->descriptions[$studentId] ?? null;
+
             if ($score !== null && $score !== '') {
                 Grade::updateOrCreate(
                     [
@@ -68,12 +108,12 @@ class TeacherController extends Controller
                         'class_id'   => $classId,
                     ],
                     [
-                        'teacher_id' => $teacherId,
-                        'score'      => $score,
+                        'teacher_id'  => $teacherId,
+                        'score'       => $score,
+                        'description' => $description,
                     ]
                 );
             } else {
-                // Jika dikosongkan oleh guru, hapus data nilainya jika sebelumnya pernah ada
                 Grade::where('student_id', $studentId)
                     ->where('subject_id', $subjectId)
                     ->where('class_id', $classId)
@@ -81,6 +121,53 @@ class TeacherController extends Controller
             }
         }
 
-        return redirect()->route('guru.dashboard')->with('success', 'Nilai ASTS berhasil disimpan!');
+        // Sesuaikan nama route redirect menjadi 'guru.nilai.input'
+        return redirect()->route('guru.nilai.input', [$classId, $subjectId])->with('success', 'Nilai dan Capaian Kompetensi berhasil disimpan!');
+    }
+    // 4. Menampilkan halaman rekapitulasi dan cetak daftar nilai mapel
+    public function rekapNilai($classId, $subjectId)
+    {
+        $teacherId = auth()->id();
+
+        // Validasi hak akses guru terhadap kelas & mapel
+        $assignment = TeachingAssignment::where('user_id', $teacherId)
+            ->where('class_id', $classId)
+            ->where('subject_id', $subjectId)
+            ->with(['schoolClass', 'subject'])
+            ->firstOrFail();
+
+        // Ambil daftar siswa
+        $students = Student::where('class_id', $classId)->orderBy('name', 'asc')->get();
+
+        // Ambil data nilai berdasarkan mapel dan kelas
+        $grades = Grade::where('class_id', $classId)
+            ->where('subject_id', $subjectId)
+            ->get()
+            ->keyBy('student_id');
+
+        // Hitung statistik kelas
+        $scoredValues = $grades->pluck('score')->filter(fn($val) => $val !== null && $val !== '');
+        $totalSiswa = $students->count();
+        $totalSudahDinilai = $scoredValues->count();
+        $rataRata = $totalSudahDinilai > 0 ? round($scoredValues->avg(), 1) : 0;
+        $nilaiTertinggi = $totalSudahDinilai > 0 ? $scoredValues->max() : 0;
+        $nilaiTerendah = $totalSudahDinilai > 0 ? $scoredValues->min() : 0;
+
+        return view('guru.rekap-nilai', compact(
+            'assignment', 'students', 'grades', 
+            'totalSiswa', 'totalSudahDinilai', 'rataRata', 
+            'nilaiTertinggi', 'nilaiTerendah', 'classId', 'subjectId'
+        ));
+    }
+    // Menampilkan daftar pilihan kelas & mapel untuk rekapitulasi dari Navbar
+    public function rekapIndex()
+    {
+        $teacherId = auth()->id();
+        
+        $assignments = TeachingAssignment::with(['schoolClass', 'subject'])
+            ->where('user_id', $teacherId)
+            ->get();
+
+        return view('guru.rekap-index', compact('assignments'));
     }
 }

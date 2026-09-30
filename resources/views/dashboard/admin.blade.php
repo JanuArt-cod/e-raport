@@ -19,7 +19,7 @@
                     </div>
                     <div class="flex items-center space-x-3">
                         <span class="text-xs text-slate-500 dark:text-slate-400 bg-black/5 dark:bg-white/5 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800">
-                            <i class="fa-solid fa-calendar-days text-emerald-500 mr-2"></i> Tahun Ajaran: 2025/2026 Ganjil
+                            <i class="fa-solid fa-calendar-days text-emerald-500 mr-2"></i> Tahun Ajaran {{ \App\Models\Setting::get('academic_year', '2025/2026') }} • Semester {{ \App\Models\Setting::get('semester', 'Ganjil') }}
                         </span>
                     </div>
                 </div>
@@ -176,6 +176,19 @@
                             Kelola <i class="fa-solid fa-arrow-right ml-1.5 transform group-hover:translate-x-1 transition-transform"></i>
                         </div>
                     </a>
+                    <!-- Kartu Rekapitulasi & Cetak Rapor -->
+                    {{-- <a href="{{ route('admin.reports.index') }}" class="p-4 rounded-2xl bg-white/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 transition-all group flex flex-col justify-between">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                            </div>
+                            <h4 class="font-semibold text-sm text-slate-900 dark:text-white">Rekap & Cetak Rapor</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Pantau matriks nilai dan cetak rapor ASTS.</p>
+                        </div>
+                        <div class="mt-4 text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center">
+                            Kelola <i class="fa-solid fa-arrow-right ml-1.5 transform group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a> --}}
 
                 </div>
             </div>
