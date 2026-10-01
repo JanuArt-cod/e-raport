@@ -121,8 +121,11 @@ class TeacherController extends Controller
             }
         }
 
-        // Sesuaikan nama route redirect menjadi 'guru.nilai.input'
-        return redirect()->route('guru.nilai.input', [$classId, $subjectId])->with('success', 'Nilai dan Capaian Kompetensi berhasil disimpan!');
+        // REDIREKSI DINAMIS: Cek apakah yang login wali_kelas atau guru biasa
+        $redirectRoute = (auth()->user()->role === 'wali_kelas') ? 'homeroom.nilai.input' : 'guru.nilai.input';
+
+        return redirect()->route($redirectRoute, [$classId, $subjectId])
+            ->with('success', 'Nilai dan Capaian Kompetensi berhasil disimpan!');
     }
     // 4. Menampilkan halaman rekapitulasi dan cetak daftar nilai mapel
     public function rekapNilai($classId, $subjectId)

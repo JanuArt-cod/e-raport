@@ -2,8 +2,17 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    <!-- BAGIAN LOGO & NAMA SEKOLAH DI DALAM CARD LOGIN -->
     <div class="text-center mb-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-1">Masuk ke Sistem</h2>
+        @if(\App\Models\Setting::get('school_logo'))
+                        <img src="{{ asset(\App\Models\Setting::get('school_logo')) }}" alt="Logo Sekolah" class="w-16 h-16 object-contain mx-auto">
+                    @else
+                        <div class="w-16 h-16 border border-dashed border-slate-400 flex items-center justify-center text-[9px] text-slate-400 mx-auto">Logo</div>
+                    @endif
+
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-1">
+            {{ config('school.name', 'Masuk ke Sistem') }}
+        </h2>
         <p class="text-xs text-slate-500 dark:text-slate-400">Silakan masukkan kredensial akun Anda.</p>
     </div>
 

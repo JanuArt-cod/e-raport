@@ -1,70 +1,55 @@
 <x-app-layout>
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             
             <!-- Header Halaman -->
-            <div class="glass-card p-6 md:p-8 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xl">
+            <div class="glass-card p-6 sm:p-8 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xl">
                 <div>
-                    <span class="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
+                    <span class="text-[10px] sm:text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
                         Monitoring Akademik
                     </span>
-                    <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white mt-2">
+                    <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-2">
                         Status Pengisian Nilai Guru Mapel
                     </h1>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         Kelas Binaan: <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ $myClass->name }}</span> | Total Siswa: {{ $myClass->students->count() }} Orang
                     </p>
                 </div>
-                <div>
-                    <a href="{{ route('homeroom.dashboard') }}" class="px-4 py-2.5 rounded-xl bg-slate-500/10 hover:bg-slate-500/20 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all inline-flex items-center space-x-2">
+                <div class="w-full md:w-auto">
+                    <a href="{{ route('homeroom.dashboard') }}" class="w-full md:w-auto px-4 py-2.5 rounded-xl bg-slate-500/10 hover:bg-slate-500/20 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all inline-flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-arrow-left"></i>
                         <span>Kembali ke Dashboard</span>
                     </a>
                 </div>
             </div>
 
-            {{-- <!-- Bagian Grafik Chart.js -->
-            <div class="glass-card p-6 rounded-3xl shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-slate-800/60 pb-3">
-                    <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center space-x-2">
-                        <i class="fa-solid fa-chart-column text-emerald-500"></i>
-                        <span>Grafik Progres Persentase Pengisian Nilai (%)</span>
-                    </h3>
-                    <span class="text-[11px] text-slate-400">Skala 0% s.d. 100%</span>
-                </div>
-                
-                <div class="relative w-full h-72">
-                    <canvas id="gradingChart"></canvas>
-                </div>
-            </div> --}}
-
             <!-- Tabel Daftar Status Mapel -->
-            <div class="glass-card rounded-3xl overflow-hidden shadow-xl">
-                <div class="p-6 border-b border-slate-200/60 dark:border-slate-800/60">
+            <div class="glass-card rounded-3xl overflow-hidden shadow-xl border border-slate-200/60 dark:border-slate-800/60">
+                <div class="p-5 sm:p-6 border-b border-slate-200/60 dark:border-slate-800/60">
                     <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center space-x-2">
                         <i class="fa-solid fa-clipboard-list text-emerald-500"></i>
                         <span>Rekapitulasi Detail Kelengkapan Nilai Per Mata Pelajaran</span>
                     </h3>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead>
                             <tr class="bg-slate-500/5 text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 border-b border-slate-200/60 dark:border-slate-800/60">
-                                <th class="py-3 px-6 text-center w-16">No</th>
-                                <th class="py-3 px-6">Mata Pelajaran</th>
-                                <th class="py-3 px-6 text-center">Progres Input Nilai</th>
-                                <th class="py-3 px-6 text-center">Status Pengisian</th>
+                                <th class="py-3 px-4 sm:px-6 text-center w-16">No</th>
+                                <th class="py-3 px-4 sm:px-6">Mata Pelajaran</th>
+                                <th class="py-3 px-4 sm:px-6 text-center">Progres Input Nilai</th>
+                                <th class="py-3 px-4 sm:px-6 text-center">Status Pengisian</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-xs">
                             @forelse($monitoringData as $index => $data)
                                 <tr class="hover:bg-slate-500/5 transition-colors">
-                                    <td class="py-4 px-6 text-center font-semibold text-slate-500">{{ $index + 1 }}</td>
-                                    <td class="py-4 px-6 font-bold text-slate-800 dark:text-slate-200 uppercase">
+                                    <td class="py-4 px-4 sm:px-6 text-center font-semibold text-slate-500">{{ $index + 1 }}</td>
+                                    <td class="py-4 px-4 sm:px-6 font-bold text-slate-800 dark:text-slate-200 uppercase">
                                         {{ $data['subject']->name }}
                                     </td>
-                                    <td class="py-4 px-6">
+                                    <td class="py-4 px-4 sm:px-6">
                                         <div class="w-full max-w-xs mx-auto space-y-1.5">
                                             <!-- Teks Keterangan & Persentase -->
                                             <div class="flex justify-between text-[11px] font-mono text-slate-600 dark:text-slate-300">
@@ -78,7 +63,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="py-4 px-6 text-center">
+                                    <td class="py-4 px-4 sm:px-6 text-center whitespace-nowrap">
                                         @if($data['status'] === 'Selesai')
                                             <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] border border-emerald-500/20 inline-flex items-center space-x-1">
                                                 <i class="fa-solid fa-check"></i>
@@ -109,50 +94,4 @@
 
         </div>
     </div>
-
-    <!-- Script Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const ctx = document.getElementById('gradingChart').getContext('2d');
-            
-            const labels = @json($chartLabels);
-            const dataValues = @json($chartData);
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Progres Pengisian (%)',
-                        data: dataValues,
-                        backgroundColor: 'rgba(16, 185, 129, 0.2)', // Emerald tint
-                        borderColor: 'rgb(16, 185, 129)',         // Emerald primary
-                        borderWidth: 2,
-                        borderRadius: 8,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
-        });
-    </script>
 </x-app-layout>

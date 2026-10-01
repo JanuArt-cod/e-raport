@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminMonitoringController;
 use App\Http\Controllers\HomeroomLedgerController;
 use App\Http\Controllers\HomeroomNoteController;
 use App\Http\Controllers\HomeroomTeacherController;
@@ -14,10 +15,13 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TeachingAssignmentController;
 use App\Http\Controllers\UserController;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('auth.login');
+    // Ambil data pengaturan sekolah pertama (atau sesuaikan dengan struktur database Anda)
+    $setting = Setting::first(); 
+    return view('auth.login', compact('setting'));
 });
 
 // Rute Pintar / Traffic Controller untuk nama 'dashboard'
@@ -67,6 +71,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Rute Pengaturan Sistem & Raport Cetak
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+    Route::get('/monitoring', [AdminMonitoringController::class, 'index'])->name('monitoring.index');
 });
 
 // Dashboard Panitia Ujian
@@ -98,6 +104,12 @@ Route::middleware(['auth', 'role:wali_kelas'])->prefix('homeroom')->name('homero
     Route::get('/ledger', [HomeroomLedgerController::class, 'index'])->name('ledger.index');
     Route::get('/ledger/print', [HomeroomLedgerController::class, 'printLedger'])->name('ledger.print');
     Route::get('/grading-monitor', [HomeroomTeacherGradeMonitorController::class, 'index'])->name('grading.index');
+
+    // Rute Indeks Mata Pelajaran yang Diampu Wali Kelas
+    Route::get('/nilai/index', [HomeroomTeacherController::class, 'nilaiIndex'])->name('nilai.index');
+
+    Route::get('/nilai/input/{classId}/{subjectId}', [TeacherController::class, 'inputForm'])->name('nilai.input');
+    Route::post('/nilai/input/{classId}/{subjectId}', [TeacherController::class, 'storeGrades'])->name('nilai.store');
 });
 
 

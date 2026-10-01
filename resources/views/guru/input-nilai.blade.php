@@ -30,9 +30,13 @@
                     </a>
                 </div>
             </div>
-
+            @php
+                $storeRoute = (auth()->user()->role === 'wali_kelas') 
+                    ? route('homeroom.nilai.store', [$classId, $subjectId]) 
+                    : route('guru.nilai.store', [$classId, $subjectId]);
+            @endphp
             <!-- Ubah dari route('guru.grades.store') menjadi route('guru.nilai.store') -->
-            <form action="{{ route('guru.nilai.store', [$classId, $subjectId]) }}" method="POST">
+            <form action="{{ $storeRoute }}" method="POST">
                 @csrf
 
                 <div class="glass-card rounded-3xl overflow-hidden shadow-xl space-y-4">
